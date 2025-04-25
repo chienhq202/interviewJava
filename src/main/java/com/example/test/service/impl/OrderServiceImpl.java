@@ -7,6 +7,9 @@ import com.example.test.repository.OrderItemRepository;
 import com.example.test.repository.OrderRepository;
 import com.example.test.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
 
     @Override
-    public Object create(OrderRequestDTO orderRequestDTO) {
+    public Order create(OrderRequestDTO orderRequestDTO) {
         Order order = new Order();
         order.setCustomerName(orderRequestDTO.getCustomerName());
         order.setOrderDate(orderRequestDTO.getOrderDate());
@@ -43,11 +46,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Object detail(Long id) {
+    public Order detail(Long id) {
         Optional<Order> orderOptional = orderRepository.findById(id);
         if (orderOptional.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy đơn hàng với ID: " + id);
         }
         return orderOptional.get();
+    }
+
+    @Override
+    public Page<Order> search(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderRepository.findAll(pageable);
     }
 }
