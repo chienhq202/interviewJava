@@ -7,10 +7,13 @@ import com.example.test.repository.OrderItemRepository;
 import com.example.test.repository.OrderRepository;
 import com.example.test.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +40,14 @@ public class OrderServiceImpl implements OrderService {
             orderItemRepository.saveAll(orderItems);
         }
         return orderSave;
+    }
+
+    @Override
+    public Object detail(Long id) {
+        Optional<Order> orderOptional = orderRepository.findById(id);
+        if (orderOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy đơn hàng với ID: " + id);
+        }
+        return orderOptional.get();
     }
 }
